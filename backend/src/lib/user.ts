@@ -37,7 +37,71 @@ export const createUser = async (
       email,
       password,
       verificationCode,
-      verificationCodeExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      verificationCodeExpires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
+    },
+  });
+
+  return user;
+};
+
+export const getVerificationCode = async (code: string) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      verificationCode: code,
+    },
+    select: {
+      verificationCode: true,
+      verificationCodeExpires: true,
+      isVerified: true,
+      id: true,
+    },
+  });
+  return user;
+};
+
+export const updateVerificationCode = async (id: string) => {
+  const user = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      isVerified: true,
+      verificationCode: null,
+      verificationCodeExpires: null,
+    },
+    select: {
+      id: true,
+      email: true,
+      isVerified: true,
+      verificationCode: true,
+      verificationCodeExpires: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return user;
+};
+
+export const updateEmailPassword = async (
+  id: string,
+  resetToken: string,
+  resetTokenExpires: Date
+) => {
+  const user = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: resetTokenExpires,
+    },
+    select: {
+      id: true,
+      email: true,
+      resetPasswordToken: true,
+      resetPasswordExpires: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 

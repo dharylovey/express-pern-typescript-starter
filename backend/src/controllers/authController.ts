@@ -1,15 +1,30 @@
 import { RequestHandler } from "express";
 import {
+  ForfotVerifyEmailSchema,
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
   UserSchema,
+  verifyEmailSchema,
+  VerifyEmailSchema,
 } from "../zodTypeSchema/userSchema";
 import { comparePassword, hashPassword } from "../lib/bcrypt";
 import z from "zod";
-import { checkExistsEmail, createUser, getUserByEmail } from "../lib/user";
-import { generateTokenSetCookie } from "../utils/token";
-import { generateVerificationCode } from "../utils/generateVerificationCode";
+import {
+  checkExistsEmail,
+  createUser,
+  getUserByEmail,
+  getVerificationCode,
+  updateEmailPassword,
+  updateVerificationCode,
+} from "../lib/user";
 import { sendVerificationEmail } from "../lib/email";
+import {
+  generateCryptoToken,
+  generateTokenSetCookie,
+  resetPasswordTokenExpires,
+} from "../utils/token";
+import { generateVerificationCode } from "../utils/generateVerificationCode";
 
 export const login: RequestHandler = async (req, res) => {
   const data: UserSchema = req.body;
@@ -97,11 +112,11 @@ export const register: RequestHandler = async (req, res) => {
       updatedAt: user.updatedAt,
     };
 
-    // Generate and set token
-    await generateTokenSetCookie(res, user.id);
-
     // Send verification email
     await sendVerificationEmail(user.email, verificationCode);
+
+    // Generate and set token
+    await generateTokenSetCookie(res, user.id);
 
     return res.status(200).json({
       success: true,
@@ -120,6 +135,107 @@ export const register: RequestHandler = async (req, res) => {
   }
 };
 
+export const verifyEmail: RequestHandler = async (req, res) => {
+  const data: VerifyEmailSchema = req.body;
+  const validatedData = verifyEmailSchema.safeParse(data);
+
+  //validate data
+  if (!validatedData.success) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid verification code",
+    });
+  }
+
+  const { code } = validatedData.data;
+  try {
+    const user = await getVerificationCode(code);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or Expired verification code ",
+      });
+    }
+
+    const updatedUser = await updateVerificationCode(user.id);
+
+    const newUser = {
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      verificationCode: updatedUser.verificationCode,
+      verificationCodeExpires: updatedUser.verificationCodeExpires,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Email successfully verified",
+      data: newUser,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation error:", error);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid request data" });
+    }
+
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const logout: RequestHandler = (req, res) => {
-  res.send("Logged out");
+  res.clearCookie("auth_token");
+  res.status(200).json({ success: true, message: "Logout successful" });
+};
+
+export const forgotPassword: RequestHandler = async (req, res) => {
+  const data: ForfotVerifyEmailSchema = req.body;
+  const validatedData = forgotPasswordSchema.safeParse(data);
+
+  if (!validatedData.success) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email",
+    });
+  }
+
+  try {
+    const { email } = validatedData.data;
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const resetToken = await generateCryptoToken();
+    const resetTokenExpires = await resetPasswordTokenExpires();
+
+    const updatedUser = await updateEmailPassword(
+      user.id,
+      resetToken,
+      resetTokenExpires
+    );
+
+    const newUser = {
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation error:", error);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid request data" });
+    }
+
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
