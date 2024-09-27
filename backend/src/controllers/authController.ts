@@ -43,6 +43,7 @@ export const login: RequestHandler = async (req, res) => {
     const { email, password } = validatedData.data;
 
     const userExist = await getUserByEmail(email);
+
     if (!userExist || !userExist.password || !userExist.email) {
       return res
         .status(400)
