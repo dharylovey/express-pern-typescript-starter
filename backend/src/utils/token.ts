@@ -9,12 +9,23 @@ export const generateTokenSetCookie = async (res: Response, userId: string) => {
     expiresIn: "1h",
   });
 
-  res.cookie("token", token, {
+  res.cookie("auth_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 3600000, // 1 hour
+    maxAge: 24 * 60 * 60 * 1000,
   });
 
   return token;
+};
+
+export const generateCryptoToken = async () => {
+  const resetToken = crypto.randomUUID().toString();
+
+  return resetToken;
+};
+
+export const resetPasswordTokenExpires = async () => {
+  const resetTokenExpires = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 day
+  return resetTokenExpires;
 };

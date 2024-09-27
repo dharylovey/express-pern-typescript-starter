@@ -23,6 +23,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       <h1 style="color: blue;">Please confirm your email</h1>
       <p style="font-size: 18px;">Copy the verification code below</p>
       <p style="font-size: 50px;">${token}</p>
+      <p style="font-size: 18px;">This code will expire in 1 hour</p>
     </div>
     `,
   };

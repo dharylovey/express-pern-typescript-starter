@@ -3,7 +3,6 @@ import authRoutes from "./routes/authRoutes";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { requestLogger } from "./middleware/middleware";
-import { sendVerificationEmail } from "./lib/email";
 
 const app = express();
 dotenv.config();
