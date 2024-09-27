@@ -18,7 +18,11 @@ import {
   updateEmailPassword,
   updateVerificationCode,
 } from "../lib/user";
-import { sendVerificationEmail } from "../lib/email";
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../lib/email";
 import {
   generateCryptoToken,
   generateTokenSetCookie,
@@ -45,6 +49,12 @@ export const login: RequestHandler = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
+    if (!userExist.isVerified) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please verify your email" });
+    }
+
     const user = await comparePassword(password, userExist.password);
     if (!user) {
       return res
@@ -52,12 +62,18 @@ export const login: RequestHandler = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    // const token = generateTokenSetCookie(email);
+    await generateTokenSetCookie(res, userExist.id);
+
+    const newUser = {
+      userId: userExist.id,
+      email: userExist.email,
+      isVerified: userExist.isVerified,
+    };
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      // token,
+      data: newUser,
     });
   } catch (error) {}
 };
@@ -160,6 +176,9 @@ export const verifyEmail: RequestHandler = async (req, res) => {
 
     const updatedUser = await updateVerificationCode(user.id);
 
+    // Send Welcome Email
+    await sendWelcomeEmail(updatedUser.email);
+
     const newUser = {
       userId: updatedUser.id,
       email: updatedUser.email,
@@ -222,12 +241,21 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       resetTokenExpires
     );
 
+    // Send email
+    await sendPasswordResetEmail(updatedUser.email, resetToken);
+
     const newUser = {
       userId: updatedUser.id,
       email: updatedUser.email,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
     };
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset link sent to your email",
+      data: newUser,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error("Validation error:", error);
