@@ -28,3 +28,5 @@ app.use("/api/auth", requestLogger, authRoutes);
     console.log(`Server running on port ${URL}:${PORT}`);
   });
 })();
+
+export default app;
