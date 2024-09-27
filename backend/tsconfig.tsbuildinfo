@@ -1,1 +1,1 @@
-{"root":["./src/server.ts"],"version":"5.6.2"}
+{"root":["./src/server.ts","./src/controllers/authcontroller.ts","./src/lib/bcrypt.ts","./src/lib/email.ts","./src/lib/prisma.ts","./src/lib/user.ts","./src/middleware/middleware.ts","./src/routes/authroutes.ts","./src/utils/generateverificationcode.ts","./src/utils/token.ts","./src/zodtypeschema/userschema.ts"],"version":"5.6.2"}
