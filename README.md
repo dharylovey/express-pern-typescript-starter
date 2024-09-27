@@ -11,8 +11,8 @@ Initialize a new project with npm init -y. This creates a package.json file for 
 Install the required dependencies for your project using npm:
 
 Bash
-npm install -D typescript ts-node nodemon @types/express @types/swagger-ui-express @types/swagger-jsdoc
-npm install express swagger-ui-express swagger-jsdoc
+npm install -D typescript ts-node nodemon @types/express 
+npm install express 
 Use code with caution.
 
 -D flag installs packages as development dependencies, not required for running the application.
@@ -57,12 +57,3 @@ JSON
 "type": "module"
 Use code with caution.
 
-This informs Node.js that the project uses ES modules.
-
-6. Create a Readme File (Optional)
-Create a README.md file in your project directory to document your project setup, usage instructions, and any additional details.
-
-7. Project Structure
-Typically, your backend code will reside within a backend/src folder.  Create an index.ts file (or similar) within this folder as your entry point for the Express application.
-
-This setup provides a solid foundation for building your Express backend with TypeScript and Swagger integration. Feel free to consult the official documentation of each library for further details.
