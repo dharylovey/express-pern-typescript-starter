@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import {
   forgotPassword,
   login,
@@ -9,21 +9,18 @@ import {
 
 const router: Router = Router();
 
-router.post("/register", (req, res, next) => {
-  register(req, res).then((res) => next(res));
-});
-router.post("/login", (req, res, next) => {
-  login(req, res).then((res) => next(res));
-});
+const asyncHandler =
+  (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res)).catch(next);
+  };
+
+router.post("/register", asyncHandler(register));
+router.post("/login", asyncHandler(login));
 
 router.post("/logout", logout);
 
-router.post("/verify-email", (req, res, next) => {
-  verifyEmail(req, res).then((res) => next(res));
-});
+router.post("/verify-email", asyncHandler(verifyEmail));
 
-router.post("/forgot-password", (req, res, next) => {
-  forgotPassword(req, res).then((res) => next(res));
-});
+router.post("/forgot-password", asyncHandler(forgotPassword));
 
 export default router;
