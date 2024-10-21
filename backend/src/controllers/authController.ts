@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { Request, Response } from "express";
 import {
   ForfotVerifyEmailSchema,
   forgotPasswordSchema,
@@ -30,7 +30,7 @@ import {
 } from "../utils/token";
 import { generateVerificationCode } from "../utils/generateVerificationCode";
 
-export const login: RequestHandler = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   const data: UserSchema = req.body;
   const validatedData = loginSchema.safeParse(data);
 
@@ -76,10 +76,21 @@ export const login: RequestHandler = async (req, res) => {
       message: "Login successful",
       data: newUser,
     });
-  } catch (error) {}
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation error:", error);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid request data" });
+    }
+
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
 };
 
-export const register: RequestHandler = async (req, res) => {
+export const register = async (req: Request, res: Response) => {
   const data: UserSchema = req.body;
   const validatedData = registerSchema.safeParse(data);
 
@@ -148,11 +159,13 @@ export const register: RequestHandler = async (req, res) => {
         .json({ success: false, message: "Invalid request data" });
     }
 
-    res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
-export const verifyEmail: RequestHandler = async (req, res) => {
+export const verifyEmail = async (req: Request, res: Response) => {
   const data: VerifyEmailSchema = req.body;
   const validatedData = verifyEmailSchema.safeParse(data);
 
@@ -206,12 +219,12 @@ export const verifyEmail: RequestHandler = async (req, res) => {
   }
 };
 
-export const logout: RequestHandler = (req, res) => {
+export const logout = (req: Request, res: Response) => {
   res.clearCookie("auth_token");
   res.status(200).json({ success: true, message: "Logout successful" });
 };
 
-export const forgotPassword: RequestHandler = async (req, res) => {
+export const forgotPassword = async (req: Request, res: Response) => {
   const data: ForfotVerifyEmailSchema = req.body;
   const validatedData = forgotPasswordSchema.safeParse(data);
 
