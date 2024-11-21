@@ -4,9 +4,9 @@
   "main": "build/src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --build",
-    "start": "node ./build/src/server.js",
-    "dev": "nodemon ./src/server.ts"
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node ./dist/build/server.js",
+    "dev": "nodemon -r tsconfig-paths/register src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.15",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "nodemon": "^3.1.7",
     "prisma": "^5.21.1",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.6.3"
   }
 }

@@ -1,11 +1,9 @@
+import { forgotPassword } from "@/controllers/authController/forgotPassword";
+import { login } from "@/controllers/authController/login";
+import { logout } from "@/controllers/authController/logout";
+import { register } from "@/controllers/authController/register";
+import { verifyEmail } from "@/controllers/authController/verifyEmail";
 import { NextFunction, Request, Response, Router } from "express";
-import {
-  forgotPassword,
-  login,
-  logout,
-  register,
-  verifyEmail,
-} from "../controllers/authController";
 
 const router: Router = Router();
 
@@ -14,8 +12,8 @@ const asyncHandler =
     Promise.resolve(fn(req, res)).catch(next);
   };
 
-router.post("/register", asyncHandler(register));
 router.post("/login", asyncHandler(login));
+router.post("/register", asyncHandler(register));
 
 router.post("/logout", logout);
 

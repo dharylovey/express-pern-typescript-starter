@@ -1,8 +1,8 @@
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express, { urlencoded } from "express";
-import { requestLogger } from "./middleware/middleware";
-import authRoutes from "./routes/authRoutes";
+import { requestLogger } from "@/middleware/middleware";
+import authRoutes from "@/routes/authRoutes";
 
 const app = express();
 dotenv.config();
