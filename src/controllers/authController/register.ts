@@ -2,7 +2,6 @@ import { hashPassword } from "@/lib/bcrypt";
 import { sendVerificationEmail } from "@/lib/email";
 import { checkExistsEmail, createUser } from "@/lib/user";
 import { generateVerificationCode } from "@/utils/generateVerificationCode";
-import { generateTokenSetCookie } from "@/utils/token";
 import { UserSchema, registerSchema } from "@/zodTypeSchema/userSchema";
 import { Request, Response } from "express";
 import z from "zod";
@@ -59,9 +58,6 @@ export const register = async (req: Request, res: Response) => {
 
     // Send verification email
     await sendVerificationEmail(user.email, verificationCode);
-
-    // Generate and set token
-    await generateTokenSetCookie(res, user.id);
 
     return res.status(200).json({
       success: true,
