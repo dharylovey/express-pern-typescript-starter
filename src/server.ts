@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express, { urlencoded } from "express";
 import { requestLogger } from "@/middleware/middleware";
 import authRoutes from "@/routes/authRoutes";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 dotenv.config();
@@ -16,17 +17,22 @@ app.use(cookieParser());
 
 // Main route
 app.get("/", (req, res) => {
+  throw new Error("Test error");
   res.send("Hello World!");
 });
 
 // Auth routes
 app.use("/api/auth", requestLogger, authRoutes);
 
+// Error handler
+app.use(errorHandler);
 // Start server
-(async function main() {
+async function main() {
   app.listen(PORT, () => {
     console.log(`Server running on port ${URL}:${PORT}`);
   });
-})();
+}
+
+main();
 
 export default app;
