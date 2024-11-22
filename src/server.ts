@@ -17,7 +17,6 @@ app.use(cookieParser());
 
 // Main route
 app.get("/", (req, res) => {
-  throw new Error("Test error");
   res.send("Hello World!");
 });
 
