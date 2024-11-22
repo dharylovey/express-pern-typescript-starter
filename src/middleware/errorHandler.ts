@@ -1,7 +1,7 @@
-import { statusCode } from "@/constant/httpStatusCode";
 import { ErrorRequestHandler } from "express";
 import z from "zod";
 import { Response } from "express";
+import statusCode from "@/constant/httpStatusCode";
 
 const handleZodError = (res: Response, error: z.ZodError) => {
   const errors = error.issues.map((err) => ({

@@ -3,14 +3,14 @@ import { getUserByEmail, updateEmailPassword } from "@/lib/user";
 import catchErrors from "@/utils/catchErrors";
 import { generateCryptoToken, resetPasswordTokenExpires } from "@/utils/token";
 import {
-  ForfotVerifyEmailSchema,
+  ForgotVerifyEmailSchema,
   forgotPasswordSchema,
 } from "@/zodTypeSchema/userSchema";
 import { Request, Response } from "express";
 
 export const forgotPassword = catchErrors(
   async (req: Request, res: Response) => {
-    const data: ForfotVerifyEmailSchema = req.body;
+    const data: ForgotVerifyEmailSchema = req.body;
     const validatedData = forgotPasswordSchema.safeParse(data);
 
     if (!validatedData.success) {
