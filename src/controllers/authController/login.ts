@@ -1,3 +1,5 @@
+import { ErrorCode, SuccessCode, VerifyCode } from "@/constant/responseMessage";
+import { BAD_REQUEST, OK } from "@/constant/httpStatusCode";
 import { comparePassword } from "@/lib/bcrypt";
 import { getUserByEmail } from "@/lib/user";
 import catchErrors from "@/utils/catchErrors";
@@ -11,8 +13,8 @@ export const login = catchErrors(async (req: Request, res: Response) => {
 
   if (!validatedData.success)
     return res
-      .status(400)
-      .json({ success: false, message: "Invalid email or password" });
+      .status(BAD_REQUEST)
+      .json({ success: false, message: ErrorCode.InvalidEmail });
 
   const { email, password } = validatedData.data;
 
@@ -20,21 +22,21 @@ export const login = catchErrors(async (req: Request, res: Response) => {
 
   if (!userExist || !userExist.password || !userExist.email) {
     return res
-      .status(400)
-      .json({ success: false, message: "Invalid email or password" });
+      .status(BAD_REQUEST)
+      .json({ success: false, message: ErrorCode.InvalidEmail });
   }
 
   if (!userExist.isVerified) {
     return res
-      .status(400)
-      .json({ success: false, message: "Please verify your email" });
+      .status(BAD_REQUEST)
+      .json({ success: false, message: VerifyCode.VerifyEmail });
   }
 
   const user = await comparePassword(password, userExist.password);
   if (!user) {
     return res
-      .status(400)
-      .json({ success: false, message: "Invalid email or password" });
+      .status(BAD_REQUEST)
+      .json({ success: false, message: ErrorCode.InvalidPassword });
   }
 
   await generateTokenSetCookie(res, userExist.id);
@@ -45,9 +47,9 @@ export const login = catchErrors(async (req: Request, res: Response) => {
     isVerified: userExist.isVerified,
   };
 
-  return res.status(200).json({
+  return res.status(OK).json({
     success: true,
-    message: "Login successful",
+    message: SuccessCode.LoginSuccess,
     data: newUser,
   });
 });

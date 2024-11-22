@@ -1,3 +1,5 @@
+import { BAD_REQUEST, OK } from "@/constant/httpStatusCode";
+import { VerifyCode } from "@/constant/responseMessage";
 import { sendWelcomeEmail } from "@/lib/email";
 import { getVerificationCode, updateVerificationCode } from "@/lib/user";
 import catchErrors from "@/utils/catchErrors";
@@ -13,9 +15,9 @@ export const verifyEmail = catchErrors(async (req: Request, res: Response) => {
 
   //validate data
   if (!validatedData.success) {
-    return res.status(400).json({
+    return res.status(BAD_REQUEST).json({
       success: false,
-      message: "Invalid verification code",
+      message: VerifyCode.InvalidVerification,
     });
   }
 
@@ -23,9 +25,9 @@ export const verifyEmail = catchErrors(async (req: Request, res: Response) => {
   const user = await getVerificationCode(code);
 
   if (!user) {
-    return res.status(400).json({
+    return res.status(BAD_REQUEST).json({
       success: false,
-      message: "Invalid or Expired verification code ",
+      message: VerifyCode.InvalidVerificationCode,
     });
   }
 
@@ -43,9 +45,9 @@ export const verifyEmail = catchErrors(async (req: Request, res: Response) => {
     updatedAt: updatedUser.updatedAt,
   };
 
-  return res.status(200).json({
+  return res.status(OK).json({
     success: true,
-    message: "Email successfully verified",
+    message: VerifyCode.EmailSuccessVerified,
     data: newUser,
   });
 });

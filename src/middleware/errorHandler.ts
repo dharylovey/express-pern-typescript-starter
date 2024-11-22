@@ -1,7 +1,6 @@
-import { ErrorRequestHandler } from "express";
+import { BAD_REQUEST } from "@/constant/httpStatusCode";
+import { ErrorRequestHandler, Response } from "express";
 import z from "zod";
-import { Response } from "express";
-import statusCode from "@/constant/httpStatusCode";
 
 const handleZodError = (res: Response, error: z.ZodError) => {
   const errors = error.issues.map((err) => ({
@@ -9,7 +8,7 @@ const handleZodError = (res: Response, error: z.ZodError) => {
     message: err.message,
   }));
 
-  return res.status(statusCode.BAD_REQUEST).json({
+  return res.status(BAD_REQUEST).json({
     errors,
     message: error.message,
   });

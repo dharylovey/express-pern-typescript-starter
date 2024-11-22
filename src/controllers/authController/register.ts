@@ -1,3 +1,5 @@
+import { BAD_REQUEST, OK } from "@/constant/httpStatusCode";
+import { ErrorCode, SuccessCode } from "@/constant/responseMessage";
 import { hashPassword } from "@/lib/bcrypt";
 import { sendVerificationEmail } from "@/lib/email";
 import { checkExistsEmail, createUser } from "@/lib/user";
@@ -12,9 +14,9 @@ export const register = catchErrors(async (req: Request, res: Response) => {
 
   // Validate data
   if (!validatedData.success) {
-    return res.status(400).json({
+    return res.status(BAD_REQUEST).json({
       success: false,
-      message: "Invalid email or password",
+      message: ErrorCode.InvalidEmail,
     });
   }
 
@@ -22,9 +24,9 @@ export const register = catchErrors(async (req: Request, res: Response) => {
 
   // Check if passwords match
   if (password !== confirmPassword) {
-    return res.status(400).json({
+    return res.status(BAD_REQUEST).json({
       Success: false,
-      message: "Passwords do not match",
+      message: ErrorCode.PasswordNotMatch,
     });
   }
 
@@ -33,8 +35,8 @@ export const register = catchErrors(async (req: Request, res: Response) => {
 
   if (userExist) {
     return res
-      .status(400)
-      .json({ Success: false, message: "User already exists" });
+      .status(BAD_REQUEST)
+      .json({ Success: false, message: ErrorCode.UserExist });
   }
 
   // Hash password
@@ -58,9 +60,9 @@ export const register = catchErrors(async (req: Request, res: Response) => {
   // Send verification email
   await sendVerificationEmail(user.email, verificationCode);
 
-  return res.status(200).json({
+  return res.status(OK).json({
     success: true,
-    message: "User created successfully",
+    message: SuccessCode.UserCreated,
     data: newUser,
   });
 });

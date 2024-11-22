@@ -1,3 +1,5 @@
+import { ErrorCode, SuccessCode } from "@/constant/responseMessage";
+import { BAD_REQUEST, OK } from "@/constant/httpStatusCode";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { getUserByEmail, updateEmailPassword } from "@/lib/user";
 import catchErrors from "@/utils/catchErrors";
@@ -14,9 +16,9 @@ export const forgotPassword = catchErrors(
     const validatedData = forgotPasswordSchema.safeParse(data);
 
     if (!validatedData.success) {
-      return res.status(400).json({
+      return res.status(BAD_REQUEST).json({
         success: false,
-        message: "Invalid email",
+        message: ErrorCode.InvalidPassword,
       });
     }
 
@@ -24,9 +26,9 @@ export const forgotPassword = catchErrors(
     const user = await getUserByEmail(email);
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(BAD_REQUEST).json({
         success: false,
-        message: "User not found",
+        message: ErrorCode.UserNotFound,
       });
     }
 
@@ -49,9 +51,9 @@ export const forgotPassword = catchErrors(
       updatedAt: updatedUser.updatedAt,
     };
 
-    return res.status(200).json({
+    return res.status(OK).json({
       success: true,
-      message: "Password reset link sent to your email",
+      message: SuccessCode.PasswordReset,
       data: newUser,
     });
   }
