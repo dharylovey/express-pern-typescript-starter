@@ -63,4 +63,4 @@ export type UserSchema =
   | z.infer<typeof registerSchema>;
 
 export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
-export type ForgotVerifyEmailSchema = z.infer<typeof forgotPasswordSchema>;
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
